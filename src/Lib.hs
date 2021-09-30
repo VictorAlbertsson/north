@@ -15,10 +15,10 @@ loadFile f = lexFile f
 --           & compileFile
 
 lexFile :: String -> [[String]]
-lexFile f = lines f & map lexLine
+lexFile f = lines f & fmap lexLine
 
 lexLine :: String -> [String]
-lexLine l = words l & map lexWord
+lexLine l = words l & fmap lexWord
 
 -- TODO: Enum of instances `symbol` and `unsigned integer`
 lexWord :: String -> String
