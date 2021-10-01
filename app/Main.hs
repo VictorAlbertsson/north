@@ -11,7 +11,7 @@ parseArgs :: [String] -> IO String
 parseArgs []     = usage   >> exit
 parseArgs ["-h"] = usage   >> exit
 parseArgs ["-v"] = version >> exit
-parseArgs (f:_)  = (show . loadFile) <$> readFile f
+parseArgs (f:_)  = (show . loadProgram) <$> readFile f
 
 usage   = putStrLn "Usage: north [-vh] [file]"
 version = putStrLn "North v0.0.1"
