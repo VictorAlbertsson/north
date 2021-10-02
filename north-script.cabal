@@ -27,6 +27,7 @@ library
   exposed-modules:
       Lib
       Program.Check
+      Program.Common
       Program.Compile
       Program.Expand
       Program.Parse

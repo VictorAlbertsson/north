@@ -3,6 +3,8 @@ module Program.Parse where
 import Data.Char
 import Control.Applicative
 
+import Program.Common
+
 newtype Parser a = Parser
     { parse :: String -> Maybe (String, a)
     }
@@ -25,18 +27,6 @@ instance Alternative Parser where
     empty = Parser $ \_ -> Nothing -- Failing parser
     (Parser p1) <|> (Parser p2) = -- Option parser
         Parser $ \i -> p1 i <|> p2 i
-
--- TODO: Implement comment handling, either as a `TokenComment` field or as a `Maybe`
--- TODO: Better and more extensive documentation
--- TODO: Add character literal parsing
-data Token
-    -- Labels control type relevant behaviour, for more information see README
-    = TokenLabel           String
-    | TokenSymbol          String
-    | TokenString          String
-    | TokenUnsignedInteger Word
-    | TokenSignedInteger   Int
-    deriving (Show, Read, Eq)
 
 -- TODO: Track line and column during parsing for better error messages
 -- NOTE: Might be unnecessry / could be inlined into `Parser` monad
