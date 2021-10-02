@@ -26,6 +26,10 @@ source-repository head
 library
   exposed-modules:
       Lib
+      Program.Check
+      Program.Compile
+      Program.Expand
+      Program.Parse
   other-modules:
       Paths_north_script
   hs-source-dirs:

@@ -1,8 +1,5 @@
---{-# LANGUAGE FlexibleContexts #-}
 module Program.Parse where
 
-import Data.Function
-import Data.Functor.Identity
 import Data.Char
 import Control.Applicative
 
@@ -49,12 +46,12 @@ step = parse programTokenizer
 
 programTokenizer :: Parser [Token]
 programTokenizer = sequenceParser spacingParser expressionTokenizer
-  -- <|> isSymbolTokenizer -- BUG: Hangs the prompt when included
 
 expressionTokenizer
     =   unsignedIntegerTokenizer
     <|> stringTokenizer
     <|> labelTokenizer
+    <|> symbolTokenizer
 
 unsignedIntegerTokenizer :: Parser Token
 unsignedIntegerTokenizer = (TokenUnsignedInteger . read) <$> (nonemptyParser $ spanParser isDigit)
@@ -71,14 +68,16 @@ labelTokenizer = TokenLabel <$> (charParser (== ':') *> (nonemptyParser $ spanPa
 sequenceParser :: Parser a -> Parser b -> Parser [b]
 sequenceParser s e = (:) <$> e <*> many (s *> e) <|> pure []
 
--- The problem with the parser hanging has its origin here
--- Combining `sequenceParser` with `spacingParser` results in the expression `(many (many ...` which hangs the parser
 spacingParser :: Parser String
 spacingParser = spanParser isSpace
 
 spanParser :: (Char -> Bool) -> Parser String
 spanParser = many . charParser
 
+-- NOTE: Nesting multiple calls to `many` hangs the program
+-- since `many` applied to a empty parser is undefined behaviour.
+-- Therefore the solution is to apply `nonemptyParser` inbetween
+-- calls to `many`.
 nonemptyParser :: Parser [a] -> Parser [a]
 nonemptyParser (Parser p) =
     Parser $ \i -> do
@@ -115,54 +114,4 @@ escCharParser
     <|> ('\t' <$ phraseParser "\\t")
 
 phraseParser :: String -> Parser String
-phraseParser p = fmap (charParser . (==)) p & sequenceA
-
---------------------------------------
-
---import Text.Parsec as Parsec
-
---data Token
---    -- Labels control type relevant behaviour, for more information see README
---    = ToLabelToken           String
---    | ToSymbolToken          String
---    | ToStringToken          String
---    | ToUnsignedIntegerToken Integer
---    | ToSignedIntegerToken   Integer
---    deriving (Show, Read, Eq)
-
--- --parseProgram :: String -> Maybe (String, [Token])
--- parseProgram p = Parsec.parse program "(unknown)" p
--- 
--- program :: ParsecT String u Identity [Token]
--- program = expressionTokens `Parsec.sepBy` Parsec.spaces
--- 
--- expressionTokens
---     =   {-unsignedIntegerToken
---     <|> -}stringToken
---     <|> labelToken
---     <|> symbolToken
---     -- TODO: Add error reporting with `<?>`
--- 
--- 
--- --unsignedIntegerToken = ToUnsignedIntegerToken <$> natural
--- 
--- stringToken = ToStringToken <$> Parsec.between start end body
---   where
---     start = Parsec.char '\"'
---     end   = Parsec.char '\"'
---     body  = Parsec.many (strChar <|> escChar) -- TODO: Add error reporting with `<?>`
--- 
--- labelToken = ToLabelToken <$> (Parsec.char ':' *> (Parsec.many $ Parsec.satisfy isLetter))
--- 
--- symbolToken = ToSymbolToken <$> (Parsec.many $ Parsec.satisfy isLetter)
--- 
--- strChar = Parsec.satisfy $ (&&) <$> (/= '"') <*> (/= '\\')
--- 
--- escChar
---     =   ('"'  <$ Parsec.string "\\\"")
---     <|> ('\\' <$ Parsec.string "\\\\")
---     <|> ('\b' <$ Parsec.string "\\b")
---     <|> ('\f' <$ Parsec.string "\\f")
---     <|> ('\n' <$ Parsec.string "\\n")
---     <|> ('\r' <$ Parsec.string "\\r")
---     <|> ('\t' <$ Parsec.string "\\t")
+phraseParser p = sequenceA $ fmap (charParser . (==)) p
