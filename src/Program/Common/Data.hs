@@ -1,4 +1,4 @@
-module Program.Common where
+module Program.Common.Data where
 
 -- TODO: Implement comment handling, either as a `TokenComment` field or as a `Maybe`
 -- TODO: Better and more extensive documentation

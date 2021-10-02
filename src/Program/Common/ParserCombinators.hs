@@ -1,9 +1,13 @@
-module Program.Parse where
+module Program.Common.ParserCombinators where
 
 import Data.Char
 import Control.Applicative
 
-import Program.Common
+import Program.Common.Data
+
+-- TODO: Track line and column during parsing for better error messages
+-- NOTE: Might be unnecessry / could be inlined into `Parser` monad
+newtype TokenWrapper = TokenWrapper (String, Int, Int, Token)
 
 newtype Parser a = Parser
     { parse :: String -> Maybe (String, a)
@@ -27,33 +31,6 @@ instance Alternative Parser where
     empty = Parser $ \_ -> Nothing -- Failing parser
     (Parser p1) <|> (Parser p2) = -- Option parser
         Parser $ \i -> p1 i <|> p2 i
-
--- TODO: Track line and column during parsing for better error messages
--- NOTE: Might be unnecessry / could be inlined into `Parser` monad
-newtype TokenWrapper = TokenWrapper (String, Int, Int, Token)
-
-step = parse programTokenizer
-
-programTokenizer :: Parser [Token]
-programTokenizer = sequenceParser spacingParser expressionTokenizer
-
-expressionTokenizer
-    =   unsignedIntegerTokenizer
-    <|> stringTokenizer
-    <|> labelTokenizer
-    <|> symbolTokenizer
-
-unsignedIntegerTokenizer :: Parser Token
-unsignedIntegerTokenizer = (TokenUnsignedInteger . read) <$> (nonemptyParser $ spanParser isDigit)
-
-stringTokenizer :: Parser Token
-stringTokenizer = TokenString <$> pairParser '"' '"' (many (nrmCharParser <|> escCharParser))
-
-symbolTokenizer = TokenSymbol <$> (nonemptyParser $ spanParser isLetter)
-
-signedIntegerTokenizer = undefined -- TODO
-
-labelTokenizer = TokenLabel <$> (charParser (== ':') *> (nonemptyParser $ spanParser isLetter))
 
 sequenceParser :: Parser a -> Parser b -> Parser [b]
 sequenceParser s e = (:) <$> e <*> many (s *> e) <|> pure []
@@ -90,18 +67,6 @@ charParser f = Parser p
       | otherwise = Nothing
     p [] = Nothing -- TODO: FIX: Irregular handling of empty input
 
-nrmCharParser :: Parser Char
-nrmCharParser = charParser ((&&) <$> (/= '"') <*> (/= '\\'))
-
-escCharParser :: Parser Char
-escCharParser
-    =   ('"'  <$ phraseParser "\\\"")
-    <|> ('\\' <$ phraseParser "\\\\")
-    <|> ('\b' <$ phraseParser "\\b")
-    <|> ('\f' <$ phraseParser "\\f")
-    <|> ('\n' <$ phraseParser "\\n")
-    <|> ('\r' <$ phraseParser "\\r")
-    <|> ('\t' <$ phraseParser "\\t")
-
 phraseParser :: String -> Parser String
 phraseParser p = sequenceA $ fmap (charParser . (==)) p
+

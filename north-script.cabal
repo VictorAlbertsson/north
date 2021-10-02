@@ -27,10 +27,11 @@ library
   exposed-modules:
       Lib
       Program.Check
-      Program.Common
+      Program.Common.Data
+      Program.Common.ParserCombinators
       Program.Compile
       Program.Expand
-      Program.Parse
+      Program.Lex
   other-modules:
       Paths_north_script
   hs-source-dirs:
