@@ -3,22 +3,20 @@ import Program.Common.Data
 import Control.Exception
 import Data.List
 
-typeIndex = 5 -- Number of `IntrinsicType`s (in `Program.Common.Data`)
-funcIndex = 4 -- Number of `IntrinsicFunc`s (in `Program.Common.Data`)
-
 tests = zip [1..]
-    [ -- #ObfuscatedHaskell
-      -- Compares `funcIndex` to the length of `lookupTable`
-      (flip assert
-          <*> ((==) $ fromIntegral $ length lookupTable)
-          $   funcIndex
-      ) == funcIndex
-    ]
+    [ ]
 
-testStatus True  = "PASSED"
-testStatus False = "FAILED"
+testStatus True  = greenText "PASSED"
+  where
+    greenText t = "\^[[32m" ++ t ++ "\^[[0m"
 
-testMessage (n, t) = "[TEST #" ++ show n ++ "] " ++ testStatus t
+testStatus False = redText "FAILED"
+  where
+    redText t = "\^[[31m" ++ t ++ "\^[[0m"
+
+testMessage (n, t) = yellowText $ "[TEST #" ++ show n ++ "] " ++ testStatus t
+  where
+    yellowText t = "\^[[33m" ++ t ++ "\^[[0m"
 
 main :: IO ()
 main = putStrLn $ concat $ intersperse "\n" $ map testMessage tests
