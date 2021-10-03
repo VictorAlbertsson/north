@@ -30,6 +30,8 @@ library
       Program.Common.ParserCombinators
       Program.Compile
       Program.Expand
+      Program.Final
+      Program.Interpret
       Program.Lex
       Program.Type
   other-modules:

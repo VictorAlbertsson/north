@@ -1,5 +1,10 @@
 module Program.Common.Data where
 
+data Mode
+    = ModeCompile
+    | ModeInterpret
+    deriving (Show, Read, Eq)
+
 -- TODO: Implement comment handling, either as a `TokenComment` field or as a `Maybe`
 -- TODO: Better and more extensive documentation
 -- TODO: Add character literal token

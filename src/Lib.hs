@@ -1,15 +1,15 @@
 module Lib where
 
-import Data.Function ((&))
+import Control.Arrow ((>>>))
 
 import qualified Program.Lex
 import qualified Program.Expand
 import qualified Program.Type
-import qualified Program.Compile
+import qualified Program.Final
 
 --loadProgram :: String -> String
-loadProgram f = f
-    & Program.Lex.step
-    & Program.Expand.step
-    & Program.Type.step
-    & Program.Compile.step
+loadProgram
+    =   Program.Lex.step
+    >>> Program.Expand.step
+    >>> Program.Type.step
+    >>> Program.Final.step
