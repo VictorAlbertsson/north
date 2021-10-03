@@ -1,0 +1,3 @@
+,macro hello-world
+    "Hello World!" io write
+.macro

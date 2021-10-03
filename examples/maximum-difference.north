@@ -1,0 +1,7 @@
+# This example showcases final (syntactic) version of north
+,macro maximum-difference
+    ((-) zipmap) ((min) scanl) S
+    (0 /=) filter
+    -1 append
+    (max) foldl
+.macro
