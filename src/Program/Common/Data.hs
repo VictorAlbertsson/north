@@ -23,12 +23,16 @@ data Token
 
 data IntrinsicType
     -- Numeric types
-    = TypeN64 -- 64 bit naturals
-    | TypeI64 -- 64 bit integers
-    | TypeQ64 -- 64 bit quotients
-    | TypeR64 -- 64 bit reals
+    -- TODO: Add irrational and transcendental numbers as numeric types
+    -- NOTE: Above types might be better implemented as `properties` or `typeclasses`
+    -- TODO: Implement subtyping of numeric types
+    = TypeN64 -- 64 bit natural numbers
+    | TypeZ64 -- 64 bit integer numbers
+    | TypeQ64 -- 64 bit fractional/quotient numbers
+    | TypeR64 -- 64 bit real numbers
+    | TypeC64 -- 64 bit complex numbers
     -- Memory types
-    | TypePTR -- Memory Pointer
+    | TypePtr -- Memory Pointer
     deriving (Show, Read, Eq)
 
 -- TODO: Procedure table, <procedure name> <input types> <output types>
@@ -37,12 +41,17 @@ data IntrinsicFunc
     | FuncSub
     | FuncMul
     | FuncDiv
+    | FuncMod
+    | FuncPow
     deriving (Show, Read, Eq)
 
 lookupTable :: [(IntrinsicFunc, [IntrinsicType], [IntrinsicType])]
 lookupTable =
+    -- NOTE: Numeric functions
     [ (FuncAdd, [TypeN64, TypeN64], [TypeN64])
-    , (FuncSub, [TypeN64, TypeN64], [TypeI64])
+    , (FuncSub, [TypeN64, TypeN64], [TypeZ64])
     , (FuncMul, [TypeN64, TypeN64], [TypeN64])
-    , (FuncDiv, [TypeN64, TypeN64], [TypeR64])
+    , (FuncDiv, [TypeN64, TypeN64], [TypeQ64])
+    , (FuncMod, [TypeN64, TypeN64], [TypeN64])
+    , (FuncPow, [TypeN64, TypeN64], [TypeN64])
     ]
