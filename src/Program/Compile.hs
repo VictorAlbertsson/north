@@ -1,7 +1,7 @@
 module Program.Compile where
 
 -- TODO: Generate assembly
-step p = p
+step = id
 
 intrinsics :: [(String, String)]
 intrinsics =
