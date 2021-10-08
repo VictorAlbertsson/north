@@ -12,13 +12,12 @@ programTokenizer :: Parser [Token]
 programTokenizer = sequenceParser spacingParser expressionTokenizer
 
 expressionTokenizer
-    =   unsignedIntegerTokenizer
+    =   naturalTokenizer
     <|> stringTokenizer
-    <|> labelTokenizer
     <|> symbolTokenizer
 
-unsignedIntegerTokenizer :: Parser Token
-unsignedIntegerTokenizer = (TokenUnsignedInteger . read) <$> (nonemptyParser $ spanParser isDigit)
+naturalTokenizer :: Parser Token
+naturalTokenizer = (TokenNatural . read) <$> (nonemptyParser $ spanParser isDigit)
 
 stringTokenizer :: Parser Token
 stringTokenizer = TokenString <$> pairParser '"' '"' (many (strCharParser <|> escCharParser))
@@ -32,8 +31,13 @@ stringTokenizer = TokenString <$> pairParser '"' '"' (many (strCharParser <|> es
         <|> ('\n' <$ phraseParser "\\n")
         <|> ('\r' <$ phraseParser "\\r")
         <|> ('\t' <$ phraseParser "\\t")
+
+symbolTokenizer :: Parser Token
 symbolTokenizer = TokenSymbol <$> (nonemptyParser $ spanParser isLetter)
 
-signedIntegerTokenizer = undefined -- TODO
+stackTokenizer = undefined -- TODO
 
-labelTokenizer = TokenLabel <$> (charParser (== ':') *> (nonemptyParser $ spanParser isLetter))
+integerTokenizer  = undefined -- TODO
+rationalTokenizer = undefined -- TODO
+realTokenizer     = undefined -- TODO
+complexTokenizer  = undefined -- TODO
