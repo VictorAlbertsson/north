@@ -5,12 +5,17 @@ import Control.Applicative
 
 import Program.Common.Data
 
+parse :: Parser a -> String -> Maybe a
+parse p s = case runParser p s of
+        Just (_, ts) -> return ts
+        Nothing      -> error "[ERROR] Parser failed"
+
 -- TODO: Track line and column during parsing for better error messages
 -- NOTE: Might be unnecessry / could be inlined into `Parser` monad
 newtype TokenWrapper = TokenWrapper (String, Int, Int, Token)
 
 newtype Parser a = Parser
-    { parse :: String -> Maybe (String, a)
+    { runParser :: String -> Maybe (String, a)
     }
 
 instance Functor Parser where
@@ -69,4 +74,3 @@ charParser f = Parser p
 
 phraseParser :: String -> Parser String
 phraseParser p = sequenceA $ fmap (charParser . (==)) p
-
