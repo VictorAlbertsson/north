@@ -1,4 +1,4 @@
-module Program.Check where
+module Program.Type where
 
 -- TODO: Check the type correctness of the program
-step p = p
+step = id
