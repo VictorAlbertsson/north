@@ -2,18 +2,16 @@ module Program.Compile where
 
 import Program.Common.Data
 
---import Data.List
 import Data.Maybe
 import Data.Functor
 import Control.Arrow
---import Control.Exception
 
+-- TODO: Optimize string appends
 -- FIXME: I'm so sorry... I have sinned...
 step :: Maybe [Token] -> Maybe String
 step ts = ts
     <&> (   fmap compile
-        >>> concat
-        >>> (init <>)
+        >>> foldl (<>) init
         >>> (<> exit)
         )
   where
